@@ -6,17 +6,21 @@ services:
     build: './build/php'
     volumes:
       - ./app/html:/var/www/html
+    restart: always
+    depends_on:
+      - mysql
   mysql:
     ports:
       - "3306:3306"
     build: './build/mysql'
     environment:
-      MYSQL_ROOT_PASSWORD: "super-secret-password"
-      MYSQL_DATABASE: "db-for-my-app"
+      MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE=${MYSQL_DATABASE}
     volumes:
-      - dbData:/var/lib/mysql
+      - ./mysql_data/:/var/lib/mysql
+    restart: always
   phpmyadmin:
-    image: phpmyadmin
+    image: phpmyadmin:5.2.1
     restart: always
     ports:
       - 8080:80
@@ -25,7 +29,5 @@ services:
       PMA_HOST: mysql
       PMA_PORT: 3306
       UPLOAD_LIMIT: 300M
-
-volumes:
-  app:
-  dbData:
+    depends_on:
+      - mysql
